@@ -1,0 +1,7 @@
+port: "8080"
+db:
+  host: localhost
+  port: 5432
+  user: DB_USER
+  pass: DB_PASSWORD
+  name: shortener
