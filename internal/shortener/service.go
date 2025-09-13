@@ -1,7 +1,6 @@
 package shortener
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/calalalizade/url-shortener/internal/apperror"
@@ -55,8 +54,6 @@ func (s *Service) ShortenUrl(url string) (Url, error) {
 
 func (s *Service) GetOriginalUrl(code string) (Url, error) {
 	url, err := s.repo.GetByCode(code)
-
-	fmt.Println("------> error: ", err)
 
 	if err != nil {
 		return Url{}, &apperror.AppError{
