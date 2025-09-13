@@ -15,17 +15,17 @@ func NewHandler(s *Service) *Handler {
 }
 
 func (h *Handler) Shorten(c *gin.Context) error {
-	var req CreateShortenerRequest
+	var req CreateUrlRequestDTO
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 	}
 
-	code, err := h.service.ShortenUrl(req.Url)
+	url, err := h.service.ShortenUrl(req.Url)
 	if err != nil {
 		return err
 	}
 
-	c.JSON(http.StatusOK, code)
+	c.JSON(http.StatusOK, ToUrlResponseDTO(url))
 	return nil
 }

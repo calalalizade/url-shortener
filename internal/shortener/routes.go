@@ -8,7 +8,7 @@ import (
 )
 
 func RegisterRoutes(r *gin.RouterGroup, h *Handler) {
-	r.GET("/shorten", wrap(h.Shorten))
+	r.POST("/shorten", wrap(h.Shorten))
 }
 
 func wrap(fn func(*gin.Context) error) gin.HandlerFunc {
