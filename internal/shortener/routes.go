@@ -10,6 +10,7 @@ import (
 func RegisterRoutes(r *gin.RouterGroup, h *Handler) {
 	r.POST("/shorten", wrap(h.Shorten))
 	r.GET("/:code", wrap(h.GetByCode))
+	r.GET("/:code/stats", wrap(h.GetStats))
 }
 
 func wrap(fn func(*gin.Context) error) gin.HandlerFunc {

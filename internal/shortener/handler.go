@@ -50,3 +50,15 @@ func (h *Handler) GetByCode(c *gin.Context) error {
 
 	return nil
 }
+
+func (h *Handler) GetStats(c *gin.Context) error {
+	code := c.Param("code")
+
+	u, err := h.service.GetStats(code)
+	if err != nil {
+		return err
+	}
+
+	c.JSON(http.StatusOK, ToUrlResponseDTO(u, h.baseUrl))
+	return nil
+}
