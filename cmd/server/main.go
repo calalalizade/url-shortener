@@ -27,7 +27,7 @@ func main() {
 	// ----> Shortener setup
 	shortenerRepo := shortener.NewRepository(db)
 	shortenerService := shortener.NewService(shortenerRepo)
-	shortenerHandler := shortener.NewHandler(shortenerService)
+	shortenerHandler := shortener.NewHandler(shortenerService, cfg.BaseUrl)
 
 	// ----> Gin setup
 	r := platform.NewRouter()

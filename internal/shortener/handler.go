@@ -3,22 +3,30 @@ package shortener
 import (
 	"net/http"
 
+	"github.com/calalalizade/url-shortener/internal/apperror"
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
 	service *Service
+	baseUrl string
 }
 
-func NewHandler(s *Service) *Handler {
-	return &Handler{service: s}
+func NewHandler(s *Service, baseUrl string) *Handler {
+	return &Handler{
+		service: s,
+		baseUrl: baseUrl,
+	}
 }
 
 func (h *Handler) Shorten(c *gin.Context) error {
 	var req CreateUrlRequestDTO
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return &apperror.AppError{
+			Type:    apperror.Validation,
+			Message: "invalid request body",
+		}
 	}
 
 	url, err := h.service.ShortenUrl(req.Url)
@@ -26,6 +34,19 @@ func (h *Handler) Shorten(c *gin.Context) error {
 		return err
 	}
 
-	c.JSON(http.StatusOK, ToUrlResponseDTO(url))
+	c.JSON(http.StatusOK, ToUrlResponseDTO(url, h.baseUrl))
+	return nil
+}
+
+func (h *Handler) GetByCode(c *gin.Context) error {
+	code := c.Param("code")
+
+	u, err := h.service.GetOriginalUrl(code)
+	if err != nil {
+		return err
+	}
+
+	c.Redirect(http.StatusMovedPermanently, u.Original)
+
 	return nil
 }

@@ -16,8 +16,9 @@ type DbConfig struct {
 }
 
 type Config struct {
-	Port string   `mapstructure:"port"`
-	DB   DbConfig `mapstructure:"db"`
+	Port    string   `mapstructure:"port"`
+	BaseUrl string   `mapstructure:"baseUrl"`
+	DB      DbConfig `mapstructure:"db"`
 }
 
 func LoadConfig() *Config {

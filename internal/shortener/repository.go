@@ -27,3 +27,13 @@ func (r *Repository) Create(url, code string) (Url, error) {
 
 	return u, nil
 }
+
+func (r *Repository) GetByCode(code string) (Url, error) {
+	var u Url
+
+	err := r.db.QueryRow(
+		"SELECT original, expiration_date FROM urls WHERE code = $1", code,
+	).Scan(&u.Original, &u.ExpirationDate)
+
+	return u, err
+}

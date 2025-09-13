@@ -51,3 +51,15 @@ func (s *Service) ShortenUrl(url string) (Url, error) {
 		Message: "failed to generate a unique short URL",
 	}
 }
+
+func (s *Service) GetOriginalUrl(code string) (Url, error) {
+	url, err := s.repo.GetByCode(code)
+	if err != nil {
+		return Url{}, &apperror.AppError{
+			Type:    apperror.NotFound,
+			Message: "resource not found",
+		}
+	}
+
+	return url, nil
+}
