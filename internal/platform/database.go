@@ -3,20 +3,20 @@ package platform
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	_ "github.com/lib/pq"
 )
 
-
 func ConnectDB(cfg DbConfig) (*sql.DB, error) {
 	psqlInfo := fmt.Sprintf(
-		"host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		cfg.Host, 
-		cfg.Port, 
-		cfg.User, 
-		cfg.Pass, 
+		"host=%s port=%s user=%s "+
+			"password=%s dbname=%s sslmode=disable",
+		cfg.Host,
+		cfg.Port,
+		cfg.User,
+		cfg.Pass,
 		cfg.Name,
 	)
 
@@ -29,7 +29,15 @@ func ConnectDB(cfg DbConfig) (*sql.DB, error) {
 	db.SetMaxIdleConns(10)
 	db.SetConnMaxLifetime(30 * time.Minute)
 
-	err = db.Ping()
+	// retry mech.
+	for range 10 {
+		err = db.Ping()
+		if err == nil {
+			break
+		}
+		log.Println("Waiting for DB...")
+		time.Sleep(2 * time.Second)
+	}
 	if err != nil {
 		return nil, err
 	}

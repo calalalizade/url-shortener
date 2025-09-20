@@ -9,7 +9,7 @@ import (
 
 type DbConfig struct {
 	Host string `mapstructure:"host"`
-	Port int    `mapstructure:"port"`
+	Port string `mapstructure:"port"`
 	User string `mapstructure:"user"`
 	Pass string `mapstructure:"pass"`
 	Name string `mapstructure:"name"`
@@ -22,14 +22,21 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	viper.BindEnv("port", "PORT")
+	viper.BindEnv("baseUrl", "BASEURL")
+
+	viper.BindEnv("db.host", "DB_HOST")
+	viper.BindEnv("db.port", "DB_PORT")
+	viper.BindEnv("db.user", "DB_USER")
+	viper.BindEnv("db.pass", "DB_PASS")
+	viper.BindEnv("db.name", "DB_NAME")
+
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
-
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.AutomaticEnv()
-
-	viper.SetDefault("Port", "8080")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Println("No config file found, using env/defaults")

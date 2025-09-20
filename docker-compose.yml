@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: url_shortener
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      BASEURL: "http://localhost:8080"
+
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: postgres
+      DB_PASS: 8528282
+      DB_NAME: shortener
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 8528282
+      POSTGRES_DB: shortener
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  migrate:
+    image: migrate/migrate
+    container_name: db_migrate
+    depends_on:
+      - db
+    volumes:
+      - ./migrations:/migrations
+    command: >
+      -path=/migrations
+      -database postgres://postgres:8528282@db:5432/shortener?sslmode=disable
+      up
+
+volumes:
+  pgdata:
