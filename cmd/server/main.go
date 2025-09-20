@@ -18,15 +18,23 @@ func main() {
 	cfg := platform.LoadConfig()
 
 	// ----> DB setup
-	db, err := platform.ConnectDB(cfg.DB)
+	dbConn, err := platform.ConnectDB(cfg.DB)
 	if err != nil {
 		log.Fatal("database connection failed:", err)
 	}
-	defer db.Close()
+	defer dbConn.Close()
+
+	// ----> Redis setup
+	redisClient, err := platform.ConnectRedis(cfg.Redis)
+	if err != nil {
+		log.Fatal("redis connection failed: ", err)
+	}
+
+	cache := platform.NewRedisCache(redisClient)
 
 	// ----> Shortener setup
-	shortenerRepo := shortener.NewRepository(db)
-	shortenerService := shortener.NewService(shortenerRepo)
+	shortenerRepo := shortener.NewRepository(dbConn)
+	shortenerService := shortener.NewService(shortenerRepo, cache)
 	shortenerHandler := shortener.NewHandler(shortenerService, cfg.BaseUrl)
 
 	// ----> Gin setup

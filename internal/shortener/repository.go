@@ -1,6 +1,9 @@
 package shortener
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+)
 
 type Repository struct {
 	db *sql.DB
@@ -40,8 +43,8 @@ func (r *Repository) GetByCode(code string) (Url, error) {
 	return u, err
 }
 
-func (r *Repository) IncrementClickCount(code string) error {
-	_, err := r.db.Exec(
+func (r *Repository) IncrementClickCount(ctx context.Context, code string) error {
+	_, err := r.db.ExecContext(ctx,
 		"UPDATE urls SET click_count = click_count + 1 WHERE code = $1",
 		code,
 	)

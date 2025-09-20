@@ -38,15 +38,15 @@ func (h *Handler) Shorten(c *gin.Context) error {
 	return nil
 }
 
-func (h *Handler) GetByCode(c *gin.Context) error {
+func (h *Handler) Resolve(c *gin.Context) error {
 	code := c.Param("code")
 
-	u, err := h.service.GetOriginalUrl(code)
+	url, err := h.service.Resolve(c.Request.Context(), code)
 	if err != nil {
 		return err
 	}
 
-	c.Redirect(http.StatusMovedPermanently, u.Original)
+	c.Redirect(http.StatusMovedPermanently, url)
 
 	return nil
 }
