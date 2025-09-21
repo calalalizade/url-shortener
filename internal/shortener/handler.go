@@ -29,7 +29,7 @@ func (h *Handler) Shorten(c *gin.Context) error {
 		}
 	}
 
-	url, err := h.service.ShortenUrl(req.Url)
+	url, err := h.service.ShortenUrl(c.Request.Context(), req.Url)
 	if err != nil {
 		return err
 	}

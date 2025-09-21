@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -23,11 +24,26 @@ type RedisConfig struct {
 	DB   int    `mapstructure:"db"`
 }
 
+type CacheConfig struct {
+	Enabled bool `mapstructure:"enabled"`
+
+	HotURLTTL  time.Duration `mapstructure:"hotUrlTTL"`
+	WarmURLTTL time.Duration `mapstructure:"warmUrlTTL"`
+	ColdURLTTL time.Duration `mapstructure:"coldUrlTTL"`
+
+	HotThreshold  int `mapstructure:"hotThreshold"`
+	WarmThreshold int `mapstructure:"warmThreshold"`
+
+	MaxTTL time.Duration `mapstructure:"maxTTL"`
+	MinTTL time.Duration `mapstructure:"minTTL"`
+}
+
 type Config struct {
 	Port    string      `mapstructure:"port"`
 	BaseUrl string      `mapstructure:"baseUrl"`
 	DB      DbConfig    `mapstructure:"db"`
 	Redis   RedisConfig `mapstructure:"redis"`
+	Cache   CacheConfig `mapstructure:"cache"`
 }
 
 func LoadConfig() *Config {
@@ -50,6 +66,16 @@ func LoadConfig() *Config {
 	viper.BindEnv("redis.port", "REDIS_PORT")
 	viper.BindEnv("redis.pass", "REDIS_PASS")
 	viper.BindEnv("redis.db", "REDIS_DB")
+
+	// Cache
+	viper.BindEnv("cache.enabled", "CACHE_ENABLED")
+	viper.BindEnv("cache.hotUrlTTL", "CACHE_HOT_TTL")
+	viper.BindEnv("cache.warmUrlTTL", "CACHE_WARM_TTL")
+	viper.BindEnv("cache.coldUrlTTL", "CACHE_COLD_TTL")
+	viper.BindEnv("cache.hotThreshold", "CACHE_HOT_THRESHOLD")
+	viper.BindEnv("cache.warmThreshold", "CACHE_WARM_THRESHOLD")
+	viper.BindEnv("cache.maxTTL", "MAX_TTL")
+	viper.BindEnv("cache.minTTL", "MIN_TTL")
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")

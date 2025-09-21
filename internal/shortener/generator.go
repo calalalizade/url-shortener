@@ -1,22 +1,19 @@
 package shortener
 
-import "crypto/rand"
+import (
+	"crypto/sha256"
+)
 
 const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 const codeLength = 7
 
-func GenerateCode() (string, error) {
-	b := make([]byte, codeLength)
+func GenerateCodeFromURL(url string) string {
+	hash := sha256.Sum256([]byte(url))
 
-	_, err := rand.Read(b)
-
-	if err != nil {
-		return "", err
+	code := make([]byte, codeLength)
+	for i := range codeLength {
+		code[i] = alphabet[int(hash[i])%len(alphabet)]
 	}
 
-	for i := range b {
-		b[i] = alphabet[int(b[i])%len(alphabet)]
-	}
-
-	return string(b), nil
+	return string(code)
 }

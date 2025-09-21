@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/calalalizade/url-shortener/internal/platform"
@@ -25,16 +24,19 @@ func main() {
 	defer dbConn.Close()
 
 	// ----> Redis setup
-	redisClient, err := platform.ConnectRedis(cfg.Redis)
-	if err != nil {
-		log.Fatal("redis connection failed: ", err)
-	}
+	var cacheInstance *platform.RedisCache
+	if cfg.Cache.Enabled {
+		redisClient, err := platform.ConnectRedis(cfg.Redis)
+		if err != nil {
+			log.Fatal("redis connection failed: ", err)
+		}
 
-	cache := platform.NewRedisCache(redisClient)
+		cacheInstance = platform.NewRedisCache(redisClient)
+	}
 
 	// ----> Shortener setup
 	shortenerRepo := shortener.NewRepository(dbConn)
-	shortenerService := shortener.NewService(shortenerRepo, cache)
+	shortenerService := shortener.NewService(shortenerRepo, cacheInstance, cfg.Cache)
 	shortenerHandler := shortener.NewHandler(shortenerService, cfg.BaseUrl)
 
 	// ----> Gin setup
@@ -43,6 +45,5 @@ func main() {
 	api := r.Group("/api/v1")
 	shortener.RegisterRoutes(api, shortenerHandler)
 
-	fmt.Println("port: ---->", cfg.Port)
 	r.Run(":" + cfg.Port)
 }
